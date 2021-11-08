@@ -7,22 +7,32 @@ jobs:
   merge:
     runs-on: ubuntu-latest
     steps:
-    - name: マージ
-      run: |
-        git checkout master    
-        git fetch -a
-        git branch -a
+      - uses: actions/checkout@v1.2.0
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+      - name: Run tests with ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: マージ
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
+        run: |
+          git checkout master    
+          git fetch -a
+          git branch -a
 
-        echo 'pull origin master'
-        git pull origin master
+          echo 'pull origin master'
+          git pull origin master
 
-        echo 'checkout'
-        git checkout feature/release-20211111
-        git pull origin feature/release-20211111
-        git log -1
+          echo 'checkout'
+          git checkout feature/release-20211111
+          git pull origin feature/release-20211111
+          git log -1
 
-        echo 'mergeする'
-        git merge --allow-unrelated-histories --no-ff master
+          echo 'mergeする'
+          git merge --allow-unrelated-histories --no-ff master
         
 
     # strategy:
