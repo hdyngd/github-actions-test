@@ -1,0 +1,127 @@
+name: リリース用中間ブランチにmasterをマージ
+on:
+  push:
+    branches:
+      - master
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1.2.0
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+      - name: Run tests with ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: マージ
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
+        run: |
+          git config pull.rebase false
+          git config --global user.name "hdyngd"
+          git config --global user.email "hyanagida.0721@gmail.com"
+          git remote set-url origin ${REPO}
+          
+          git checkout master    
+          git fetch -a
+          git branch -a
+
+          echo 'pull origin master'
+          git pull origin master
+
+          echo 'checkout'
+          git checkout feature/release-20211111
+          git pull origin feature/release-20211111
+          git log -1
+
+          echo 'mergeする'
+          git merge --allow-unrelated-histories --no-ff master
+
+          echo 'pushする'
+          git push origin feature/release-20211111
+        
+
+    # strategy:
+    #   matrix:
+    #     node-version: [12.x]
+
+    # steps:
+    #   # - uses: actions/checkout@v1.2.0
+    #   #   with:
+    #   #     ref: ${{github.event.pull_request.head.ref}}
+    #   # - name: Run tests with ${{ matrix.node-version }}
+    #   #   uses: actions/setup-node@v1
+    #   #   with:
+    #   #     node-version: ${{ matrix.node-version }}
+    #   - name: Test Build & CommitPush for Release Brunch
+    #     env:
+    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #       REPO: https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
+    #     run: |
+
+    #       ## masterブランチをdeploy_testブランチにマージ
+    #       git config pull.rebase false
+    #       git config --global user.name "github bot"
+    #       git config --global user.email "tech@brightvie.me"
+
+    #       git remote set-url origin ${REPO}
+
+    #       git checkout master
+
+    #       git fetch -a
+    #       git branch -a
+
+    #       echo 'pull origin master'
+    #       git pull origin master
+
+    #       echo 'checkout'
+    #       git checkout deploy_test
+    #       git pull origin deploy_test
+    #       git log -1
+
+    #       echo 'mergeする'
+    #       git merge --allow-unrelated-histories --no-ff master
+
+    #       ## Dist以下削除
+    #       rm -rf dist
+
+    #       ## 依存インストール
+    #       echo '依存インストール'
+    #       yarn install
+
+    #       ## ビルド処理
+    #       echo '共通アプリの本番ビルド'
+    #       yarn build:dev
+
+    #       # 空コミットにならないように.tmp_deployをupする
+    #       echo $(date) > dist/.tmp_deploy
+
+    #       echo 'git status'
+    #       git status
+
+    #       git add .
+
+    #       echo 'コミット'
+    #       git commit -m '[Release] test build'
+    #       git pull origin deploy_test
+
+    #       echo 'push to deploy_test'
+    #       git push ${REPO} deploy_test
+
+    #       ##################################
+    #       # Jenkins テストサーバーへのデプロイ
+    #       ##################################
+    #       curl -X POST https://GitHub:11301c7f7fbb44b5ac25919afcbd9566dc@tools-jenkins.cdc-iot.com/job/DEPLOY_CAREZ_API_TEST/buildWithParameters?token=xxxx
+
+    #   - name: Send notification to Slack
+    #     uses: homoluctus/slatify@master
+    #     if: always()  # jobの成否に関わらずSlackへ通知
+    #     with:
+    #       type: ${{ job.status }}  # jobの成否を代入(Failure/Success)
+    #       job_name: ':carez-w::carez-w::carez-w::carez-w::carez-w::carez-w: テスト環境 API Release Build'
+    #       channel: '#notification-ci-carez'
+    #     env:
+    #       SLACK_WEBHOOK: https://hooks.slack.com/services/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
+
