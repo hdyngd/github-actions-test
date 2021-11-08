@@ -38,6 +38,9 @@ jobs:
 
           echo 'mergeする'
           git merge --allow-unrelated-histories --no-ff master
+
+          echo 'pushする'
+          git push origin feature/release-20211111
         
 
     # strategy:
