@@ -21,10 +21,11 @@ jobs:
           git config --global user.email "hyanagida.0721@gmail.com"
           git remote set-url origin ${REPO}
           git fetch -a
-
-          echo 'BRANCHES<<EOF' >> $GITHUB_ENV
-          git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g' >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+          
+          echo "BRANCHES=$(echo $BRANCH | git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g')" >> $GITHUB_ENV
+          # echo 'BRANCHES<<EOF' >> $GITHUB_ENV
+          # git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g' >> $GITHUB_ENV
+          # echo 'EOF' >> $GITHUB_ENV
       - name: マージ
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,8 +43,8 @@ jobs:
           echo 'pull origin master'
           git pull origin master
 
-          echo "BRANCHES: ${{env.BRANCHES}}"
-          for BRANCH in ${env.BRANCHES//,/ }; do
+          echo "BRANCHES: ${BRANCHES}"
+          for BRANCH in ${BRANCHES//,/ }; do
             echo 'checkout'
             git checkout $BRANCH 
             git pull origin $BRANCH
