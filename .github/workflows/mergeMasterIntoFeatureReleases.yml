@@ -22,7 +22,8 @@ jobs:
           git remote set-url origin ${REPO}
           git fetch -a
           
-          echo "BRANCHES=$(echo $BRANCH | git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g')" >> $GITHUB_ENV
+          # echo "BRANCHES=$(echo $BRANCH | git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g')" >> $GITHUB_ENV
+          echo "BRANCHES=$(echo $BRANCH | 'feature/release-20211118,feature/release-20211111' )" >> $GITHUB_ENV
           # echo 'BRANCHES<<EOF' >> $GITHUB_ENV
           # git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g' >> $GITHUB_ENV
           # echo 'EOF' >> $GITHUB_ENV
