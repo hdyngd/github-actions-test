@@ -31,7 +31,8 @@ jobs:
           echo 'pull origin master'
           git pull origin master
 
-          BRANCHES="feature/release-20211111,feature/release-20211118"
+          BRANCHES=gb -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g'
+          echo 'BRANCHES: '${BRANCHES}
           for BRANCH in ${BRANCHES//,/ }; do
             echo 'checkout'
             git checkout $BRANCH 
