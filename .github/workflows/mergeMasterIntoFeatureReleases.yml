@@ -14,11 +14,17 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      # - name: Set the value
-      #   run: |
-      #     echo 'BRANCHES<<EOF' >> $GITHUB_ENV
-      #     gb -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g' >> $GITHUB_ENV
-      #     echo 'EOF' >> $GITHUB_ENV
+      - name: Set the value
+        run: |
+          git config pull.rebase false
+          git config --global user.name "hdyngd"
+          git config --global user.email "hyanagida.0721@gmail.com"
+          git remote set-url origin ${REPO}
+          git fetch -a
+
+          echo 'BRANCHES<<EOF' >> $GITHUB_ENV
+          git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g' >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
       - name: マージ
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -36,9 +42,8 @@ jobs:
           echo 'pull origin master'
           git pull origin master
 
-          BRANCHES=git branch -a | grep feature/release-20 | sed -e 's@remotes/origin/@@g' | tr '\n' ',' | sed -e 's/,$/\n/g' | sed 's/ //g'
-          echo 'BRANCHES: '${BRANCHES}
-          for BRANCH in ${BRANCHES//,/ }; do
+          echo "BRANCHES: ${{env.BRANCHES}}"
+          for BRANCH in ${{env.BRANCHES//,/ }}; do
             echo 'checkout'
             git checkout $BRANCH 
             git pull origin $BRANCH
