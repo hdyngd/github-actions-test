@@ -43,7 +43,7 @@ jobs:
           git pull origin master
 
           echo "BRANCHES: ${{env.BRANCHES}}"
-          for BRANCH in ${{env.BRANCHES//,/ }}; do
+          for BRANCH in ${env.BRANCHES//,/ }; do
             echo 'checkout'
             git checkout $BRANCH 
             git pull origin $BRANCH
