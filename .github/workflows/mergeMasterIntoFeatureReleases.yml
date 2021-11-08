@@ -19,6 +19,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git
         run: |
+          git config pull.rebase false
+          git config --global user.name "hdyngd"
+          git config --global user.email "hyanagida.0721@gmail.com"
+          git remote set-url origin ${REPO}
+          
           git checkout master    
           git fetch -a
           git branch -a
