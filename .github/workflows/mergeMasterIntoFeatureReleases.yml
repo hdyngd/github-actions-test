@@ -31,16 +31,20 @@ jobs:
           echo 'pull origin master'
           git pull origin master
 
-          echo 'checkout'
-          git checkout feature/release-20211111
-          git pull origin feature/release-20211111
-          git log -1
+          BRANCHES="feature/release-20211111,feature/release-20211118"
+          for BRANCH in ${BRANCHES//,/ }; do
+            echo 'checkout'
+            git checkout $BRANCH 
+            git pull origin $BRANCH
+            git log -1
 
-          echo 'mergeする'
-          git merge --allow-unrelated-histories --no-ff master
+            echo 'mergeする'
+            git merge --allow-unrelated-histories --no-ff master
 
-          echo 'pushする'
-          git push origin feature/release-20211111
+            echo 'pushする'
+            git push origin $BRANCH
+          done
+          
         
 
     # strategy:
